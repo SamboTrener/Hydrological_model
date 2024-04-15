@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class HeightmapGenerator : MonoBehaviour
 {
@@ -18,9 +19,9 @@ public class HeightmapGenerator : MonoBehaviour
         Instance = this;
     }
 
-    public float[] GenerateHeightMap(int mapSize)
+    public float[,] GenerateHeightMap(int mapSize)
     {
-        var map = new float[mapSize * mapSize];
+        var map = new float[mapSize,mapSize];
         seed = (randomizeSeed) ? Random.Range(-10000, 10000) : seed;
         var prng = new System.Random(seed);
 
@@ -47,7 +48,7 @@ public class HeightmapGenerator : MonoBehaviour
                     weight *= persistence;
                     scale *= lacunarity;
                 }
-                map[y * mapSize + x] = noiseValue;
+                map[y,x] = noiseValue;
                 minValue = Mathf.Min(noiseValue, minValue);
                 maxValue = Mathf.Max(noiseValue, maxValue);
             }
@@ -56,12 +57,16 @@ public class HeightmapGenerator : MonoBehaviour
         // Normalize
         if (maxValue != minValue)
         {
-            for (int i = 0; i < map.Length; i++)
+            for (int i = 0; i < mapSize; i++)
             {
-                map[i] = (map[i] - minValue) / (maxValue - minValue);
+                for (int j = 0; j < mapSize; j++)
+                {
+                    map[i,j] = (map[i,j] - minValue) / (maxValue - minValue);
+                }
             }
         }
 
+        Debug.Log("Map created succesfully");
         return map;
     }
 }

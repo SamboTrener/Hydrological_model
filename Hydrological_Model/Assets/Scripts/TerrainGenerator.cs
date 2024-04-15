@@ -20,7 +20,7 @@ public class TerrainGenerator : MonoBehaviour
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
 
-    public void ContructMesh(int mapSize, int mapSizeWithBorder, int erosionBrushRadius, float[] map)
+    public void ContructMesh(int mapSize, int mapSizeWithBorder, int erosionBrushRadius, float[,] map)
     {
         Vector3[] verts = new Vector3[mapSize * mapSize];
         int[] triangles = new int[(mapSize - 1) * (mapSize - 1) * 6];
@@ -36,7 +36,7 @@ public class TerrainGenerator : MonoBehaviour
             Vector2 percent = new Vector2(x / (mapSize - 1f), y / (mapSize - 1f));
             Vector3 pos = new Vector3(percent.x * 2 - 1, 0, percent.y * 2 - 1) * scale;
 
-            float normalizedHeight = map[borderedMapIndex];
+            float normalizedHeight = map[y + erosionBrushRadius, x + erosionBrushRadius];
             pos += Vector3.up * normalizedHeight * elevationScale;
             verts[meshMapIndex] = pos;
 

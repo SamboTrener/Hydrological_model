@@ -724,7 +724,7 @@ MonoBehaviour:
   erode: {fileID: 529523894}
   mapSize: 255
   erosionBrushRadius: 3
-  numIterations: 30000
+  numIterations: 600000
 --- !u!4 &1814150930
 Transform:
   m_ObjectHideFlags: 0

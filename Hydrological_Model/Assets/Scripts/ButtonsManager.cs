@@ -13,7 +13,7 @@ public class ButtonsManager : MonoBehaviour
     [SerializeField] int erosionBrushRadius = 3;
     [SerializeField] int numIterations = 30000;
 
-    float[] map;
+    float[,] map;
     int mapSizeWithBorder;
 
     private void Awake()
