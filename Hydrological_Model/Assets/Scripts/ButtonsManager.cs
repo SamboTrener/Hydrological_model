@@ -12,6 +12,7 @@ public class ButtonsManager : MonoBehaviour
     [SerializeField] int mapSize = 255;
     [SerializeField] int erosionBrushRadius = 3;
     [SerializeField] int numIterations = 30000;
+    [SerializeField] int numStatesBeforeTheEnd = 20;
 
     float[,] map;
     int mapSizeWithBorder;
@@ -22,7 +23,8 @@ public class ButtonsManager : MonoBehaviour
         createTerrainButton.onClick.AddListener(CreateTerrain);
 
         var erodeButton = erode.GetComponent<Button>();
-        erodeButton.onClick.AddListener(Erode);
+        
+        erodeButton.onClick.AddListener(() => StartCoroutine(Erode()));
     }
 
     void CreateTerrain()
@@ -32,9 +34,14 @@ public class ButtonsManager : MonoBehaviour
         TerrainGenerator.Instance.ContructMesh(mapSize, mapSizeWithBorder, erosionBrushRadius, map);
     }
 
-    void Erode()
+    IEnumerator Erode()
     {
-        ErosionGenerator.Instance.Erode(map, mapSizeWithBorder, numIterations);
-        TerrainGenerator.Instance.ContructMesh(mapSize, mapSizeWithBorder, erosionBrushRadius, map);
+        for(int i = 0; i < numStatesBeforeTheEnd; i++)
+        {
+            ErosionGenerator.Instance.Erode(map, mapSizeWithBorder, numIterations / numStatesBeforeTheEnd);
+            TerrainGenerator.Instance.ContructMesh(mapSize, mapSizeWithBorder, erosionBrushRadius, map);
+            Debug.Log("New mesh constructed");
+            yield return new WaitForSeconds(5);
+        }
     }
 }

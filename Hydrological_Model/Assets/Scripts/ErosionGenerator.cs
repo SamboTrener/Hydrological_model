@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,57 +17,46 @@ public class ErosionGenerator : MonoBehaviour
         Instance = this;
     }
 
-    public int seed;
+    [SerializeField] int seed;
     [Range(2, 8)]
-    public int erosionRadius = 3;
+    [SerializeField] int erosionRadius = 3;
     [Range(0, 1)]
-    public float inertia = .05f; // ѕри нулевом значении вода мгновенно изменит направление и потечет вниз по склону.
+    [SerializeField] float inertia = .05f; // ѕри нулевом значении вода мгновенно изменит направление и потечет вниз по склону.
                                  // ѕри значении 1 вода никогда не изменит направление.
 
-    public float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
-    public float minSedimentCapacity = .01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
+    [SerializeField] float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
+    [SerializeField] float minSedimentCapacity = .01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
     [Range(0, 1)]
-    public float erodeSpeed = .3f;
+    [SerializeField] float erodeSpeed = .3f;
     [Range(0, 1)]
-    public float depositSpeed = .3f;
+    [SerializeField] float depositSpeed = .3f;
     [Range(0, 1)]
-    public float evaporateSpeed = .01f;
-    public float gravity = 4;
-    public int maxDropletLifetime = 30;
+    [SerializeField] float evaporateSpeed = .01f;
+    [SerializeField] float gravity = 4;
+    [SerializeField] int maxDropletLifetime = 30;
 
-    public float initialWaterVolume = 1;
-    public float initialSpeed = 1;
+    [SerializeField] float initialWaterVolume = 1;
+    [SerializeField] float initialSpeed = 1;
 
     // Indices and weights of erosion brush precomputed for every node
     System.Random prng;
 
-    int currentSeed;
-    int currentErosionRadius;
-    int currentMapSize;
+    PointAndWeight[,][] precalculatedWeights;
 
-    int[,][] erosionBrushIndices;
-    float[,][] erosionBrushWeights;
 
     // Initialization creates a System.Random object and precomputes indices and weights of erosion brush
-    void Initialize(int mapSize)
+    void Initialize(int mapSize, float[,] map)
     {
-        if (prng == null || currentSeed != seed)
+        prng = new System.Random(seed);
+        if(precalculatedWeights == null)
         {
-            prng = new System.Random(seed);
-            currentSeed = seed;
-        }
-
-        if (currentErosionRadius != erosionRadius || currentMapSize != mapSize || erosionBrushIndices == null)
-        {
-            InitializeBrushIndices(mapSize, erosionRadius);
-            currentErosionRadius = erosionRadius;
-            currentMapSize = mapSize;
+            precalculatedWeights = PrecalculateWeights(map, mapSize);
         }
     }
 
     public void Erode(float[,] map, int mapSize, int numIterations = 30000)
     {
-        Initialize(mapSize);
+        Initialize(mapSize, map);
 
         for (int iteration = 0; iteration < numIterations; iteration++)
         {
@@ -137,12 +129,14 @@ public class ErosionGenerator : MonoBehaviour
                     float amountToErode = Mathf.Min((sedimentCapacity - sediment) * erodeSpeed, -deltaHeight);
 
                     // Use erosion brush to erode from all nodes inside the droplet's erosion radius
-                    for (int brushPointIndex = 0; brushPointIndex < erosionBrushIndices[nodeY, nodeX].Length; brushPointIndex++)
+                    //var weightsAndPoints = GetWeights(map, mapSize, nodeY, nodeX);
+                    foreach(var element in precalculatedWeights[nodeY, nodeX])
                     {
-                        int nodeIndex = erosionBrushIndices[nodeY, nodeX][brushPointIndex];
-                        float weighedErodeAmount = amountToErode * erosionBrushWeights[nodeY, nodeX][brushPointIndex];
-                        float deltaSediment = (map[nodeY, nodeX] < weighedErodeAmount) ? map[nodeY, nodeX] : weighedErodeAmount;
-                        map[nodeY, nodeX] -= deltaSediment;
+                        var extraX = element.x;
+                        var extraY = element.y;
+                        float weighedErodeAmount = amountToErode * element.weight;
+                        float deltaSediment = (map[extraY, extraX] < weighedErodeAmount) ? map[extraY, extraX] : weighedErodeAmount;
+                        map[extraY, extraX] -= deltaSediment;
                         sediment += deltaSediment;
                     }
 
@@ -187,54 +181,65 @@ public class ErosionGenerator : MonoBehaviour
         public float gradientY;
     }
 
-    void InitializeBrushIndices(int mapSize, int radius)
+
+    class PointAndWeight
     {
-        erosionBrushIndices = new int[mapSize, mapSize][];
-        erosionBrushWeights = new float[mapSize, mapSize][];
-
-        int[] xOffsets = new int[radius * radius * 4];
-        int[] yOffsets = new int[radius * radius * 4];
-        float[] weights = new float[radius * radius * 4];
-        float weightSum = 0;
-        int addIndex = 0;
-
-        for (int y = 0; y < mapSize; y++)
+        public PointAndWeight(int y, int x, float weight)
         {
-            for (int x = 0; x < mapSize; x++)
+            this.y = y;
+            this.x = x;
+            this.weight = weight;
+        }
+
+        public int x;
+        public int y;
+        public float weight;
+    }
+
+    PointAndWeight[] GetWeights(float[,] map, int mapSize, int currentY, int currentX)
+    {
+        var pointsAndWeights = new List<PointAndWeight>();
+        float weightsSum = 0f;
+        for(int y = -erosionRadius; y < erosionRadius; y++)
+        {
+            var extraY = currentY - y;
+            if(extraY < 0 || extraY >= mapSize)
             {
-                weightSum = 0;
-                addIndex = 0;
-                for (int xAddit = -radius; xAddit <= radius; xAddit++)
+                continue;
+            }
+            for(int x = -erosionRadius; x < erosionRadius; x++)
+            {
+                var extraX = currentX - x;
+                if(extraX < 0 || extraX >= mapSize)
                 {
-                    for (int yAddit = -radius; yAddit <= radius; yAddit++)
-                    {
-                        float sqrDst = xAddit * xAddit + yAddit * yAddit;
-                        if (sqrDst < radius * radius)
-                        {
-                            int coordX = x + xAddit;
-                            int coordY = y + yAddit;
-
-                            if (coordX >= 0 && coordX < mapSize && coordY >= 0 && coordY < mapSize)
-                            {
-                                float weight = 1 - Mathf.Sqrt(sqrDst) / radius;
-                                weightSum += weight;
-                                weights[addIndex] = weight;
-                                xOffsets[addIndex] = xAddit;
-                                yOffsets[addIndex] = yAddit;
-                                addIndex++;
-                            }
-                        }
-                    }
+                    continue;
                 }
-                erosionBrushIndices[y, x] = new int[addIndex];
-                erosionBrushWeights[y, x] = new float[addIndex];
-
-                for (int j = 0; j < addIndex; j++)
-                {
-                    erosionBrushIndices[y, x][j] = (yOffsets[j] + y) * mapSize + xOffsets[j] + x;
-                    erosionBrushWeights[y, x][j] = weights[j] / weightSum;
-                }
+                var linearDicrease = Mathf.Abs(map[extraY, extraX] - map[currentY, currentX]);
+                var weight = Mathf.Max(0, erosionRadius - linearDicrease);
+                weightsSum += weight;
+                pointsAndWeights.Add(new PointAndWeight(extraY, extraX, weight));
             }
         }
+
+        for(int i = 0; i < pointsAndWeights.Count; i++)
+        {
+            pointsAndWeights[i].weight = pointsAndWeights[i].weight / weightsSum;
+        }
+
+        return pointsAndWeights.ToArray();
+    }
+
+    PointAndWeight[,][] PrecalculateWeights(float[,] map, int mapSize)
+    {
+        var precalculatedWeights = new PointAndWeight[mapSize, mapSize][];
+        for (int y = 0; y < mapSize; y++)
+        {
+            for(int x = 0; x < mapSize; x++)
+            {
+                var weights = GetWeights(map, mapSize, y, x);
+                precalculatedWeights[y, x] = weights;
+            }
+        }
+        return precalculatedWeights;
     }
 }

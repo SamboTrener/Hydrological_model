@@ -6,13 +6,13 @@ using UnityEngine.Video;
 public class HeightmapGenerator : MonoBehaviour
 {
     public static HeightmapGenerator Instance { get; private set; }
-    public int seed;
-    public bool randomizeSeed;
+    [SerializeField] int seed;
+    [SerializeField] bool randomizeSeed;
 
-    public int numOctaves = 7;
-    public float persistence = .5f;
-    public float lacunarity = 2;
-    public float initialScale = 2;
+    [SerializeField] int numOctaves = 7;
+    [SerializeField] float persistence = .5f;
+    [SerializeField] float lacunarity = 2;
+    [SerializeField] float initialScale = 2;
 
     private void Awake()
     {

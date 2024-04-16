@@ -722,9 +722,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   createTerrain: {fileID: 1816001358}
   erode: {fileID: 529523894}
-  mapSize: 255
+  mapSize: 512
   erosionBrushRadius: 3
   numIterations: 600000
+  numStatesBeforeTheEnd: 20
 --- !u!4 &1814150930
 Transform:
   m_ObjectHideFlags: 0
@@ -778,7 +779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e59aca265bb07847ae86c648bb5d6ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 0
+  seed: -4704
   randomizeSeed: 1
   numOctaves: 7
   persistence: 0.5
@@ -811,7 +812,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8809f04dc0713c84ebbc23cf441d2214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 0
+  seed: -4704
   erosionRadius: 3
   inertia: 0.05
   sedimentCapacityFactor: 4
