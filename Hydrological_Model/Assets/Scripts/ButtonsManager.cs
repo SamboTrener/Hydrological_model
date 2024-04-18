@@ -13,6 +13,7 @@ public class ButtonsManager : MonoBehaviour
     [SerializeField] int erosionBrushRadius = 3;
     [SerializeField] int numIterations = 30000;
     [SerializeField] int numStatesBeforeTheEnd = 20;
+    [SerializeField] float frameSpeed = 5f;
 
     float[,] map;
     int mapSizeWithBorder;
@@ -41,7 +42,7 @@ public class ButtonsManager : MonoBehaviour
             ErosionGenerator.Instance.Erode(map, mapSizeWithBorder, numIterations / numStatesBeforeTheEnd);
             TerrainGenerator.Instance.ContructMesh(mapSize, mapSizeWithBorder, erosionBrushRadius, map);
             Debug.Log("New mesh constructed");
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(frameSpeed);
         }
     }
 }
