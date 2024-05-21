@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -13,6 +14,7 @@ public class HeightmapGenerator : MonoBehaviour
     [SerializeField] float persistence = .5f;
     [SerializeField] float lacunarity = 2;
     [SerializeField] float initialScale = 2;
+
 
     private void Awake()
     {
@@ -65,7 +67,6 @@ public class HeightmapGenerator : MonoBehaviour
                 }
             }
         }
-
         Debug.Log("Map created succesfully");
         return map;
     }

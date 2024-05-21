@@ -355,9 +355,11 @@
 "Assets/Scripts/ButtonsManager.cs"
 "Assets/Scripts/ErosionGenerator.cs"
 "Assets/Scripts/HeightmapGenerator.cs"
+"Assets/Scripts/MeshConstructor.cs"
 "Assets/Scripts/PerlinNoise/Erosion.cs"
 "Assets/Scripts/PerlinNoise/PerlinNoiseGenerator.cs"
 "Assets/Scripts/PerlinNoise/TerrainCreator.cs"
+"Assets/Scripts/PoolGenerator.cs"
 "Assets/Scripts/TerrainGenerator.cs"
 -langversion:9.0
 
