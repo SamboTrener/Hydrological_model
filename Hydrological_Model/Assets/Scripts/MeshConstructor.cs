@@ -11,7 +11,7 @@ public class MeshConstructor : MonoBehaviour
 
     public static MeshConstructor Instance { get; private set; }
 
-    Mesh mesh;
+    static Mesh mesh;
 
     private void Awake()
     {
@@ -20,6 +20,11 @@ public class MeshConstructor : MonoBehaviour
 
     public void ConstructMesh(int mapSize, int mapSizeWithBorder, float[,] map, int erosionBrushRadius, float elevationScale)
     {
+        if (mesh == null)
+        {
+            mesh = new Mesh();
+        }
+        mesh.Clear(false);
 
         Vector3[] verts = new Vector3[mapSize * mapSize];
         int[] triangles = new int[(mapSize - 1) * (mapSize - 1) * 6];
@@ -55,21 +60,11 @@ public class MeshConstructor : MonoBehaviour
             }
         }
 
-        if (mesh == null)
-        {
-            mesh = new Mesh();
-        }
-        else
-        {
-            Debug.Log("Mesh cleared");
-            mesh.Clear();
-        }
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         mesh.vertices = verts;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
-
-        meshFilter.sharedMesh = mesh;
+        meshFilter.mesh = mesh;
         meshRenderer.sharedMaterial = tempMaterial;
     }
 }

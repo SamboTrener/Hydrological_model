@@ -428,7 +428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seed: 0
-  randomizeSeed: 1
+  randomizeSeed: 0
   numOctaves: 7
   persistence: 0.5
   lacunarity: 2
@@ -581,7 +581,6 @@ MonoBehaviour:
   maxDropletLifetime: 30
   initialWaterVolume: 1
   initialSpeed: 1
-  waterCoef: 0.1
 --- !u!4 &778447947
 Transform:
   m_ObjectHideFlags: 0
@@ -772,7 +771,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshFilter: {fileID: 894621227}
   meshRenderer: {fileID: 894621226}
-  tempMaterial: {fileID: 2100000, guid: ed8102425df79f14d9d90dedca2b136a, type: 2}
+  tempMaterial: {fileID: 2100000, guid: 063ad1ffe128c9f43907686e1f5cc3fd, type: 2}
 --- !u!23 &894621226
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1430,7 +1429,7 @@ MonoBehaviour:
   createPoolsButton: {fileID: 779230218}
   mapSize: 507
   erosionBrushRadius: 3
-  numIterations: 600000
+  numIterations: 1
   numStatesBeforeTheEnd: 10
   frameSpeed: 0.1
   elevationScale: 100
@@ -1619,7 +1618,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edd04540d8050a847aef23137a77b9df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scale: 20
   terrain: {fileID: 1707844768}
 --- !u!4 &2117431523
 Transform:

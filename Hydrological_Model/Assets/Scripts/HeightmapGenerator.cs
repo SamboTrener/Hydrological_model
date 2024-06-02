@@ -68,6 +68,9 @@ public class HeightmapGenerator : MonoBehaviour
             }
         }
         Debug.Log("Map created succesfully");
+
+        Debug.Log($"Max value = {maxValue}");
+        Debug.Log($"Min value = {minValue}");
         return map;
     }
 }

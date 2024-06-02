@@ -359,8 +359,11 @@
 "Assets/Scripts/PerlinNoise/Erosion.cs"
 "Assets/Scripts/PerlinNoise/PerlinNoiseGenerator.cs"
 "Assets/Scripts/PerlinNoise/TerrainCreator.cs"
+"Assets/Scripts/Point.cs"
+"Assets/Scripts/Pool.cs"
 "Assets/Scripts/PoolGenerator.cs"
 "Assets/Scripts/TerrainGenerator.cs"
+"Assets/Scripts/WaterDroplet.cs"
 -langversion:9.0
 
 /deterministic

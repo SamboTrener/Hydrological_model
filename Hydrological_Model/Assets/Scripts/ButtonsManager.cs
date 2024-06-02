@@ -34,27 +34,15 @@ public class ButtonsManager : MonoBehaviour
 
         erodeOnceButton.onClick.AddListener(() => StartCoroutine(ShowOneDropPath()));
 
-        createPoolsButton.onClick.AddListener(CreatePools);
+        createPoolsButton.onClick.AddListener(() => StartCoroutine(CreatePools()));
     }
 
-    void CreatePools()
+    IEnumerator CreatePools()
     {
-        /*Debug.Log($"poolMap Length is {floodMap.Length}");
-        var sum = 0;
-        for(int i = 0; i < floodMap.GetLength(0); i++)
-        {
-            for(int j = 0; j < floodMap.GetLength(1); j++)
-            {
-                if (floodMap[i,j] == 0)
-                {
-                    sum++;
-                }
-            }
-        }
-        Debug.Log(sum);*/
-
+        floodMap = new float[mapSizeWithBorder, mapSizeWithBorder];
         PoolGenerator.Instance.GeneratePools(map, floodMap, mapSizeWithBorder, numIterations);
         MeshConstructor.Instance.ConstructMesh(mapSize, mapSizeWithBorder, floodMap, erosionBrushRadius, elevationScale);
+        yield return new WaitForSeconds(frameSpeed);
     }
 
     void CreateTerrain()
