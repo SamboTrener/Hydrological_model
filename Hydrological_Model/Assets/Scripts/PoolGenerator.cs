@@ -155,55 +155,44 @@ public class PoolGenerator : MonoBehaviour
         Debug.Log("Pool creation started");
         int coordY = (int)droplet.posY;
         int coordX = (int)droplet.posX;
-        //poolMap[coordY, coordX] = map[coordY, coordX] + droplet.volume; //Капля встала в одну точку 
 
-
-        var initialPoolVolume = map[coordY, coordX] + droplet.volume;
-        Debug.Log($"volume on start = {initialPoolVolume}");
+        var initialPoolVolume = droplet.volume;
         var FirstLowestPointOfLeak = new Point(coordX, coordY, map[coordY, coordX]);
         var points = new List<Point>
         {
-            new Point(coordX, coordY, map[coordY, coordX])
+            FirstLowestPointOfLeak
         };
         var pool = new Pool(points, initialPoolVolume);  //Создан бассейн в одной точке 
+        poolMap[coordY, coordX] = map[coordY, coordX] + initialPoolVolume;
 
-        FindLowestPointOfLeak(map, pool, mapSize, initialPoolVolume); //Точка утечки присвоена 
-        //Последний параметр - костыль, без которого невозможно провести первую утечку
+        FindLowestPointOfLeak(map, poolMap, pool, mapSize); //Точка утечки новая или равна уровню воды
 
-        var iter = 0;
-        while (pool.LowestPointOfLeak.Height <= pool.Volume / pool.Points.Count)
+        var testingPoint = pool.Points.First();
+        while (pool.LowestPointOfLeak.Height < poolMap[testingPoint.Y, testingPoint.X])
         {
-            /*Debug.Log($"pool.LowestPointOfLeak.Height = {pool.LowestPointOfLeak.Height}");
-            Debug.Log($"pool.Volume / pool.Points.Count = {pool.Volume / pool.Points.Count}");
-            Debug.Log($"pool.Volume = {pool.Volume}");
-            Debug.Log($"pool.Points.Count = {pool.Points.Count}");*/
-
-            iter++;
-            if (iter == 100)
-            {
-                Debug.Log("while was too long");
-                break;
-            }
+            Debug.Log("while iteration");
             if (pool.Points.Contains(pool.LowestPointOfLeak))
             {
                 Debug.Log("pool contains lowestPointOfLeak");
                 break;
             }
 
-            pool.Points.Add(pool.LowestPointOfLeak);
-            pool.Volume += map[pool.LowestPointOfLeak.Y, pool.LowestPointOfLeak.X];
-            RebuildPool(poolMap, pool);
-            CorrectPoolPoints(poolMap, pool);
-            RebuildPool(poolMap, pool);
+            AddPointInPool(map, poolMap, pool);
 
-            pool.LowestPointOfLeak = pool.Points.First();
-            FindLowestPointOfLeak(map, pool, mapSize, pool.Volume / pool.Points.Count);
+            while (!IsPoolCorrect(map, poolMap, pool))
+            {
+                CorrectPool(map, poolMap, pool);
+            }
+
+            testingPoint = pool.Points.First(); //Обновляем точку тестирования, потому что старая могла выйти из бассейна
+
+            FindLowestPointOfLeak(map,poolMap, pool, mapSize);
+           // Debug.Log($"pool.LowestPointOfLeak.Height = {pool.LowestPointOfLeak.Height}");
+           // Debug.Log($"poolMap[testingPoint.Y, testingPoint.X] = {poolMap[testingPoint.Y, testingPoint.X]}");
         }
-        Debug.Log($"height in point - {map[pool.LowestPointOfLeak.Y, pool.LowestPointOfLeak.X]}");
-        Debug.Log($"pool height in point - {poolMap[pool.LowestPointOfLeak.Y, pool.LowestPointOfLeak.X]}");
     }
 
-    void FindLowestPointOfLeak(float[,] map, Pool pool, int mapSize, float poolHeightLevel)
+    void FindLowestPointOfLeak(float[,] map, float[,] poolMap, Pool pool, int mapSize)
     {
         foreach (var point in pool.Points)
         {
@@ -221,7 +210,7 @@ public class PoolGenerator : MonoBehaviour
                     }
                     if (pool.Points.FirstOrDefault(poolPoint => poolPoint.Y == point.Y + y && poolPoint.X == point.X + x) == null) //Если соседняя точка не в бассейне
                     {
-                        if (pool.LowestPointOfLeak.Height + poolHeightLevel > map[point.Y + y, point.X + x]) //Найдена более низкая точка 
+                        if (poolMap[point.Y, point.X] > map[point.Y + y, point.X + x]) //Найдена более низкая точка 
                         {
                             pool.LowestPointOfLeak = new Point(point.X + x, point.Y + y, map[point.Y + y, point.X + x]);
                         }
@@ -231,112 +220,69 @@ public class PoolGenerator : MonoBehaviour
         }
     }
 
-    void RebuildPool(float[,] poolMap, Pool pool)
+    void AddPointInPool(float[,] map, float[,] poolMap, Pool pool)
     {
-        Debug.Log($"pool point count on rebuild = {pool.Points.Count}");
-        Debug.Log($"pool volume on rebuild = {pool.Volume}");
+        var lowestPoint = pool.LowestPointOfLeak; //Для удобства
+        var testingPoint = pool.Points.First(); //Для удобства
+
+        var dif = poolMap[testingPoint.Y, testingPoint.X] - map[lowestPoint.Y, lowestPoint.X];
+
+        pool.Points.Add(lowestPoint); //Точка стала частью бассейна
+        poolMap[lowestPoint.Y, lowestPoint.X] = map[lowestPoint.Y, lowestPoint.X] + dif; //Посчитали в точке пулмап
+
+        foreach (var point in pool.Points) //Пересчитали пулмап для других точек
+        {
+            poolMap[point.Y, point.X] -= dif / pool.Points.Count;
+            // Debug.Log($"poolmap в точке из которой вычитаем {poolMap[point.Y, point.X]}");
+        }
+
+
         foreach (var point in pool.Points)
         {
-            poolMap[point.Y, point.X] = pool.Volume / pool.Points.Count;
+            Debug.Log(poolMap[point.Y, point.X]);
         }
     }
 
-    void CorrectPoolPoints(float[,] poolMap, Pool pool)
+    bool IsPoolCorrect(float[,] map, float[,] poolMap, Pool pool)
     {
-        List<Point> pointsToDelete = new List<Point>();
-        bool needToRemovePoint = false;
         foreach (var point in pool.Points)
         {
-            if (poolMap[point.Y, point.X] < point.Height) //Точка вышла из бассейна после ребилда 
+            if (poolMap[point.Y, point.X] < map[point.Y, point.X])
             {
-               // pointsToDelete.Add(point);
-                needToRemovePoint = true;
+                return false;
             }
         }
-        if (needToRemovePoint)
-        {
-            var pointToRemove = FindHighestPointInPool(pool);
-            pool.Points.Remove(pointToRemove);
-        }
-       /* foreach (var point in pointsToDelete)
-        {
-            pool.Volume -= point.Height;
-            pool.Points.Remove(point);
-            Debug.Log($"REMOVED point.X = {point.X}, point.Y = {point.Y}");
-        }*/
-    }
-
-    bool IsPoolCorrect(float[,] poolMap, Pool pool)
-    {
-        foreach (var point in pool.Points)
-        {
-            if (poolMap[point.Y, point.X] < point.Height)
-                return false;
-        }
-        if (pool.LowestPointOfLeak.Height < pool.Volume / pool.Points.Count)
-            return false;
-
         return true;
     }
 
-    Point FindHighestPointInPool(Pool pool)
+    void CorrectPool(float[,] map, float[,] poolMap, Pool pool)
     {
-        var highestPoint = pool.Points.First();
+        var biggestDif = 0f;
+        Point baddestPoint = null;
         foreach (var point in pool.Points)
         {
-            if (point.Height > highestPoint.Height)
+            if (poolMap[point.Y, point.X] < map[point.Y, point.X])
             {
-                highestPoint = point;
+                var dif = map[point.Y, point.X] - poolMap[point.Y, point.X];
+                if (dif > biggestDif)
+                {
+                    biggestDif = dif;
+                    baddestPoint = point;
+                }
             }
         }
-        return highestPoint;
+
+        if (baddestPoint != null)
+        {
+            poolMap[baddestPoint.Y, baddestPoint.X] = 0;
+            pool.Points.Remove(baddestPoint);
+            Debug.Log("Point was removed");
+            foreach (var point in pool.Points)
+            {
+                poolMap[point.Y, point.X] -= biggestDif / pool.Points.Count;
+            }
+        }
     }
-
-    /* int pointsInPoolCount;
-     Point lowestPointOfLeak;
-     float poolHeight;
-     List<Point> poolPoints = new List<Point>();
-     void GetPoolData(float[,] map, float[,] poolMap, int mapSize, int nodeY, int nodeX)
-     {
-         lowestPointOfLeak.Height = poolMap[nodeY, nodeX];
-         lowestPointOfLeak.X = nodeX;
-         lowestPointOfLeak.Y = nodeY;
-         for (int y = -1; y <= 1; y++)
-         {
-             if (nodeY + y < 0 || nodeY + y >= mapSize)
-             {
-                 continue;
-             }
-             for (int x = -1; x <= 1; x++)
-             {
-                 if (nodeX + x < 0 || nodeX + x >= mapSize)
-                 {
-                     continue;
-                 }
-
-                 if (poolMap[nodeY + y, nodeX + x] > map[nodeY + y, nodeX + x]) //Соседняя точка часть бассейна
-                 {
-                     if (poolPoints.Where(point => point.X == nodeX + x && point.Y == nodeY + y).Count() == 0) //Точка ещё не записана в список
-                     {
-                         poolPoints.Add(new Point { X = nodeX + x, Y = nodeY + y });
-                         GetPoolData(map, poolMap, mapSize, nodeY + y, nodeX + x);
-                     }
-                 }
-                 else //Не часть бассейна, потенциальная точка утечки
-                 {
-                     if (lowestPointOfLeak.Height > map[nodeY + y, nodeX + x])
-                     {
-                         lowestPointOfLeak.Height = map[nodeY + y, nodeX + x];
-                         lowestPointOfLeak.X = nodeX + x;
-                         lowestPointOfLeak.Y = nodeY + y;
-                     }
-                 }
-
-                 poolHeight += poolMap[nodeY, nodeX];
-                 pointsInPoolCount++;
-             }
-         }
-     }*/
 
     /* bool TryAddDropletToPool(float[,] map, float[,] poolMap, int mapSize, int nodeY, int nodeX, WaterDroplet droplet)
      {

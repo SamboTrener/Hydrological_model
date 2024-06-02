@@ -19,6 +19,9 @@ public class ButtonsManager : MonoBehaviour
     [SerializeField] float frameSpeed = 5f;
     [SerializeField] float elevationScale = 100;
 
+    [SerializeField] MeshConstructor terrainConstructor;
+    [SerializeField] MeshConstructor poolsConstructor;
+
     float[,] map;
     float[,] floodMap;
     int mapSizeWithBorder;
@@ -41,7 +44,7 @@ public class ButtonsManager : MonoBehaviour
     {
         floodMap = new float[mapSizeWithBorder, mapSizeWithBorder];
         PoolGenerator.Instance.GeneratePools(map, floodMap, mapSizeWithBorder, numIterations);
-        MeshConstructor.Instance.ConstructMesh(mapSize, mapSizeWithBorder, floodMap, erosionBrushRadius, elevationScale);
+        poolsConstructor.ConstructMesh(mapSize, mapSizeWithBorder, floodMap, erosionBrushRadius, elevationScale);
         yield return new WaitForSeconds(frameSpeed);
     }
 
@@ -50,7 +53,8 @@ public class ButtonsManager : MonoBehaviour
         mapSizeWithBorder = mapSize + erosionBrushRadius * 2;
         map = HeightmapGenerator.Instance.GenerateHeightMap(mapSizeWithBorder);
         floodMap = new float[mapSizeWithBorder, mapSizeWithBorder];
-        TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
+        terrainConstructor.ConstructMesh(mapSize, mapSizeWithBorder, map, erosionBrushRadius, elevationScale);
+        //TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
     }
 
     IEnumerator ShowOneDropPath()

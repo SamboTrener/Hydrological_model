@@ -9,14 +9,8 @@ public class MeshConstructor : MonoBehaviour
     [SerializeField] MeshRenderer meshRenderer;
     [SerializeField] Material tempMaterial;
 
-    public static MeshConstructor Instance { get; private set; }
 
-    static Mesh mesh;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
+    Mesh mesh;
 
     public void ConstructMesh(int mapSize, int mapSizeWithBorder, float[,] map, int erosionBrushRadius, float elevationScale)
     {
