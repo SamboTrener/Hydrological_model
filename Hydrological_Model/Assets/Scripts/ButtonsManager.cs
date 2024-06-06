@@ -52,7 +52,6 @@ public class ButtonsManager : MonoBehaviour
     {
         mapSizeWithBorder = mapSize + erosionBrushRadius * 2;
         map = HeightmapGenerator.Instance.GenerateHeightMap(mapSizeWithBorder);
-        floodMap = new float[mapSizeWithBorder, mapSizeWithBorder];
         terrainConstructor.ConstructMesh(mapSize, mapSizeWithBorder, map, erosionBrushRadius, elevationScale);
         //TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
     }
@@ -68,7 +67,8 @@ public class ButtonsManager : MonoBehaviour
         for(int i = 0; i < numStatesBeforeTheEnd; i++)
         {
             ErosionGenerator.Instance.Erode(map, mapSizeWithBorder, numIterations / numStatesBeforeTheEnd);
-            TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
+            terrainConstructor.ConstructMesh(mapSize, mapSizeWithBorder, map, erosionBrushRadius, elevationScale);
+            //TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
             Debug.Log("New mesh constructed");
             yield return new WaitForSeconds(frameSpeed);
         }

@@ -1,18 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Pool
 {
     public List<Point> Points;
-    public float Volume;
     public Point LowestPointOfLeak;
+    public float Volume;
+    public int Id;
 
-    public Pool(List<Point> points, float volume)
+    public Pool(List<Point> points, float volume, int id)
     {
+        Id = id;
         Points = points;
-        Volume = volume;
         LowestPointOfLeak = points.First();
+        Volume = volume;
     }
 }
