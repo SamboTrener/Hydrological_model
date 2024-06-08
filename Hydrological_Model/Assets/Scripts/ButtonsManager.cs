@@ -14,7 +14,8 @@ public class ButtonsManager : MonoBehaviour
 
     [SerializeField] int mapSize = 507;
     [SerializeField] int erosionBrushRadius = 3;
-    [SerializeField] int numIterations = 30000;
+    [SerializeField] int numIterationsPools = 10000;
+    [SerializeField] int numIterationsErosion = 600000;
     [SerializeField] int numStatesBeforeTheEnd = 20;
     [SerializeField] float frameSpeed = 5f;
     [SerializeField] float elevationScale = 100;
@@ -43,7 +44,7 @@ public class ButtonsManager : MonoBehaviour
     IEnumerator CreatePools()
     {
         floodMap = new float[mapSizeWithBorder, mapSizeWithBorder];
-        PoolGenerator.Instance.GeneratePools(map, floodMap, mapSizeWithBorder, numIterations);
+        PoolGenerator.Instance.GeneratePools(map, floodMap, mapSizeWithBorder, numIterationsPools);
         poolsConstructor.ConstructMesh(mapSize, mapSizeWithBorder, floodMap, erosionBrushRadius, elevationScale);
         yield return new WaitForSeconds(frameSpeed);
     }
@@ -58,7 +59,7 @@ public class ButtonsManager : MonoBehaviour
 
     IEnumerator ShowOneDropPath()
     {
-        yield return ErosionGenerator.Instance.ErodeOnce(map, mapSizeWithBorder, elevationScale, numIterations / numStatesBeforeTheEnd);
+        yield return ErosionGenerator.Instance.ErodeOnce(map, mapSizeWithBorder, elevationScale, numIterationsErosion / numStatesBeforeTheEnd);
         TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
     }
 
@@ -66,7 +67,7 @@ public class ButtonsManager : MonoBehaviour
     {
         for(int i = 0; i < numStatesBeforeTheEnd; i++)
         {
-            ErosionGenerator.Instance.Erode(map, mapSizeWithBorder, numIterations / numStatesBeforeTheEnd);
+            ErosionGenerator.Instance.Erode(map, mapSizeWithBorder, numIterationsErosion / numStatesBeforeTheEnd);
             terrainConstructor.ConstructMesh(mapSize, mapSizeWithBorder, map, erosionBrushRadius, elevationScale);
             //TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
             Debug.Log("New mesh constructed");

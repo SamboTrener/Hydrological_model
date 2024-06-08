@@ -573,14 +573,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   randomizeSeed: 0
   seed: 0
-  erosionRadius: 3
   inertia: 0.05
-  depositSpeed: 0.3
   evaporateSpeed: 0.01
   gravity: 4
   maxDropletLifetime: 30
-  initialWaterVolume: 0.1
+  initialWaterVolume: 0.01
   initialSpeed: 1
+  epsilon: 0.001
 --- !u!4 &778447947
 Transform:
   m_ObjectHideFlags: 0
@@ -1528,7 +1527,8 @@ MonoBehaviour:
   createPoolsButton: {fileID: 779230218}
   mapSize: 507
   erosionBrushRadius: 3
-  numIterations: 1
+  numIterationsPools: 20000
+  numIterationsErosion: 600000
   numStatesBeforeTheEnd: 10
   frameSpeed: 0.1
   elevationScale: 100
