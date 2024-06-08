@@ -362,6 +362,7 @@
 "Assets/Scripts/Point.cs"
 "Assets/Scripts/Pool.cs"
 "Assets/Scripts/PoolGenerator.cs"
+"Assets/Scripts/PoolGeneratorNonDynamic.cs"
 "Assets/Scripts/TerrainGenerator.cs"
 "Assets/Scripts/WaterDroplet.cs"
 -langversion:9.0

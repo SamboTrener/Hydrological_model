@@ -170,7 +170,7 @@ public class PoolGenerator : MonoBehaviour
                 }
             }
         }
-        Debug.Log($"point with coordinates has poolMap > map, but not in pool - X: {coordX}, Y: {coordY}");
+       // Debug.Log($"point with coordinates has poolMap > map, but not in pool - X: {coordX}, Y: {coordY}");
         throw new Exception();
     }
 
@@ -201,7 +201,7 @@ public class PoolGenerator : MonoBehaviour
 
     void AddDropletToPool(float[,] poolMap, float[,] map, WaterDroplet droplet, int mapSize)
     {
-        Debug.Log("Adding droplet to pool");
+        //Debug.Log("Adding droplet to pool");
 
         //DebugPointsCountThatHasWaterButNotInPool(poolMap, map, mapSize);
 
@@ -223,7 +223,7 @@ public class PoolGenerator : MonoBehaviour
     int id = 0;
     void CreatePool(float[,] poolMap, float[,] map, WaterDroplet droplet, int mapSize)
     {
-        Debug.Log("Pool creation started");
+        //Debug.Log("Pool creation started");
 
         //DebugPointsCountThatHasWaterButNotInPool(poolMap, map, mapSize);
 
@@ -269,12 +269,6 @@ public class PoolGenerator : MonoBehaviour
             //{
             //   break;
             //}
-
-            if (pool.Id == 678)
-            {
-                Debug.Log($"point in 678 pool =  X : {pool.Points.First().X}, Y: {pool.Points.First().Y}");
-                Debug.Log($"lowest point of leak in 678 pool =  X : {pool.LowestPointOfLeak.X}, Y: {pool.LowestPointOfLeak.Y}");
-            }
 
             if (poolMap[pool.LowestPointOfLeak.Y, pool.LowestPointOfLeak.X] > map[pool.LowestPointOfLeak.Y, pool.LowestPointOfLeak.X]) //В точке базируется другой бассейн
             {
@@ -421,15 +415,15 @@ public class PoolGenerator : MonoBehaviour
 
     void MergeTwoPools(float[,] map, float[,] poolMap, Pool pool, Pool secondPool)
     {
-        Debug.Log($"Merging pools with ids {pool.Id} and {secondPool.Id}");
+        //Debug.Log($"Merging pools with ids {pool.Id} and {secondPool.Id}");
 
-        Debug.Log("second pool volume based");
-        DebugVolTemp(map, poolMap, secondPool);
-        Debug.Log($"Second pool volume unbased = {secondPool.Volume}");
+        //Debug.Log("second pool volume based");
+        //DebugVolTemp(map, poolMap, secondPool);
+        //Debug.Log($"Second pool volume unbased = {secondPool.Volume}");
 
-        Debug.Log("first pool volume based");
-        DebugVolTemp(map, poolMap, pool);
-        Debug.Log($"first pool volume unbased = {pool.Volume}");
+        //Debug.Log("first pool volume based");
+        //DebugVolTemp(map, poolMap, pool);
+        //Debug.Log($"first pool volume unbased = {pool.Volume}");
 
         foreach (var point in secondPool.Points) //poolMap зануляем, будем добавлять точки с нуля 
         {
@@ -443,18 +437,18 @@ public class PoolGenerator : MonoBehaviour
             AddPointInPool(map, poolMap, pool, pointToAdd);
         }
 
-        Debug.Log("vol before correction");
-        DebugVolTemp(map, poolMap, pool);
+        //Debug.Log("vol before correction");
+        //DebugVolTemp(map, poolMap, pool);
         while (!IsPoolCorrect(map, poolMap, pool)) //Коррекция
         {
             CorrectPoolOnce(map, poolMap, pool);
         }
-        Debug.Log("vol after correction");
-        DebugVolTemp(map, poolMap, pool);
+        //Debug.Log("vol after correction");
+        //DebugVolTemp(map, poolMap, pool);
 
         pools.Remove(secondPool);
 
-        Debug.Log($"points in pool count after merge - {pool.Points.Count}");
+        //Debug.Log($"points in pool count after merge - {pool.Points.Count}");
     }
 
     bool TryCalculateHeightAndGradient(float[,] nodes, int mapSize, float posX, float posY, out HeightAndGradient heightAndGradient)
