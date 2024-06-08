@@ -306,6 +306,7 @@ public class PoolGenerator : MonoBehaviour
 
     void FindLowestPointOfLeak(float[,] map, float[,] poolMap, Pool pool, int mapSize)
     {
+        var biggestDif = 0f;
         foreach (var point in pool.Points)
         {
             for (int y = -1; y <= 1; y++)
@@ -322,9 +323,13 @@ public class PoolGenerator : MonoBehaviour
                     }
                     if (pool.Points.FirstOrDefault(poolPoint => poolPoint.Y == point.Y + y && poolPoint.X == point.X + x) == null) //Если соседняя точка не в бассейне
                     {
-                        if (poolMap[point.Y, point.X] > map[point.Y + y, point.X + x]) //Найдена более низкая точка 
+                        if (poolMap[point.Y, point.X] > map[point.Y + y, point.X + x]) //Найдена более низкая точка относительно уровня
                         {
-                            pool.LowestPointOfLeak = new Point(point.X + x, point.Y + y, map[point.Y + y, point.X + x]);
+                            if(poolMap[point.Y, point.X] - map[point.Y + y, point.X + x] > biggestDif)
+                            {
+                                biggestDif = poolMap[point.Y, point.X] - map[point.Y + y, point.X + x];
+                                pool.LowestPointOfLeak = new Point(point.X + x, point.Y + y, map[point.Y + y, point.X + x]);
+                            }
                         }
                     }
                 }

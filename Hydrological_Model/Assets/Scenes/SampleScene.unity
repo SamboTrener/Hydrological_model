@@ -579,7 +579,7 @@ MonoBehaviour:
   maxDropletLifetime: 30
   initialWaterVolume: 0.01
   initialSpeed: 1
-  epsilon: 0.001
+  epsilon: 0.01
 --- !u!4 &778447947
 Transform:
   m_ObjectHideFlags: 0
@@ -1527,7 +1527,7 @@ MonoBehaviour:
   createPoolsButton: {fileID: 779230218}
   mapSize: 507
   erosionBrushRadius: 3
-  numIterationsPools: 20000
+  numIterationsPools: 10000
   numIterationsErosion: 600000
   numStatesBeforeTheEnd: 10
   frameSpeed: 0.1
