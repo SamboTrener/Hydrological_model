@@ -265,10 +265,6 @@ public class PoolGenerator : MonoBehaviour
                 //  Debug.Log("pool contains lowestPointOfLeak");
                 break; 
             }
-            //if (pool.Points.Contains(pool.LowestPointOfLeak))
-            //{
-            //   break;
-            //}
 
             if (poolMap[pool.LowestPointOfLeak.Y, pool.LowestPointOfLeak.X] > map[pool.LowestPointOfLeak.Y, pool.LowestPointOfLeak.X]) //В точке базируется другой бассейн
             {
@@ -277,7 +273,7 @@ public class PoolGenerator : MonoBehaviour
                 goto Again;
             }
 
-            AddPointInPool(map, poolMap, pool, pool.LowestPointOfLeak); //После этого ломается бассейн 678 temp
+            AddPointInPool(map, poolMap, pool, pool.LowestPointOfLeak); 
 
             //Debug.Log("vol before correction");
             //DebugVolTemp(map, poolMap, pool);
@@ -315,9 +311,11 @@ public class PoolGenerator : MonoBehaviour
                     {
                         continue;
                     }
-                    if (pool.Points.FirstOrDefault(poolPoint => poolPoint.Y == point.Y + y && poolPoint.X == point.X + x) == null) //Если соседняя точка не в бассейне
+                    if (pool.Points.FirstOrDefault(poolPoint => poolPoint.Y == point.Y + y && poolPoint.X == point.X + x) == null) 
+                        //Если соседняя точка не в бассейне
                     {
-                        if (poolMap[point.Y, point.X] > map[point.Y + y, point.X + x]) //Найдена более низкая точка относительно уровня
+                        if (poolMap[point.Y, point.X] > map[point.Y + y, point.X + x]) 
+                            //Найдена более низкая точка относительно уровня
                         {
                             if(poolMap[point.Y, point.X] - map[point.Y + y, point.X + x] > biggestDif)
                             {
@@ -333,20 +331,16 @@ public class PoolGenerator : MonoBehaviour
 
     void AddPointInPool(float[,] map, float[,] poolMap, Pool pool, Point pointToAdd)
     {
-        var testingPoint = pool.Points.First(); //Для удобства
+        var testingPoint = pool.Points.First(); //Уровень воды в бассейне определяется любой точкой бассейна
 
         var dif = poolMap[testingPoint.Y, testingPoint.X] - map[pointToAdd.Y, pointToAdd.X];
-        //Debug.Log($"dif = {dif}");
-        //Debug.Log($"pool.points.count = {pool.Points.Count}");
-
 
         pool.Points.Add(pointToAdd); //Точка стала частью бассейна
-        poolMap[pointToAdd.Y, pointToAdd.X] = map[pointToAdd.Y, pointToAdd.X] + dif; //Посчитали в точке пулмап
+        poolMap[pointToAdd.Y, pointToAdd.X] = map[pointToAdd.Y, pointToAdd.X] + dif; //Посчитали в точке уровень воды
 
-        foreach (var point in pool.Points) //Пересчитали пулмап для других точек
+        foreach (var point in pool.Points) //Пересчитали уровень воды для других точек
         {
             poolMap[point.Y, point.X] -= dif / pool.Points.Count;
-            // Debug.Log($"poolmap в точке из которой вычитаем {poolMap[point.Y, point.X]}");
         }
     }
 
@@ -404,8 +398,7 @@ public class PoolGenerator : MonoBehaviour
         if (baddestPoint != null)
         {
             poolMap[baddestPoint.Y, baddestPoint.X] = 0;
-            pool.Points.Remove(baddestPoint); //Есть некая проблема, что бассейн может разделиться на несколько, но на уровне кода это всё ещё один бассейн
-            //Debug.Log("Point was removed");
+            pool.Points.Remove(baddestPoint); 
             foreach (var point in pool.Points)
             {
                 poolMap[point.Y, point.X] -= biggestDif / pool.Points.Count;
@@ -415,16 +408,6 @@ public class PoolGenerator : MonoBehaviour
 
     void MergeTwoPools(float[,] map, float[,] poolMap, Pool pool, Pool secondPool)
     {
-        //Debug.Log($"Merging pools with ids {pool.Id} and {secondPool.Id}");
-
-        //Debug.Log("second pool volume based");
-        //DebugVolTemp(map, poolMap, secondPool);
-        //Debug.Log($"Second pool volume unbased = {secondPool.Volume}");
-
-        //Debug.Log("first pool volume based");
-        //DebugVolTemp(map, poolMap, pool);
-        //Debug.Log($"first pool volume unbased = {pool.Volume}");
-
         foreach (var point in secondPool.Points) //poolMap зануляем, будем добавлять точки с нуля 
         {
             poolMap[point.Y, point.X] = 0;
@@ -437,18 +420,12 @@ public class PoolGenerator : MonoBehaviour
             AddPointInPool(map, poolMap, pool, pointToAdd);
         }
 
-        //Debug.Log("vol before correction");
-        //DebugVolTemp(map, poolMap, pool);
         while (!IsPoolCorrect(map, poolMap, pool)) //Коррекция
         {
             CorrectPoolOnce(map, poolMap, pool);
         }
-        //Debug.Log("vol after correction");
-        //DebugVolTemp(map, poolMap, pool);
 
         pools.Remove(secondPool);
-
-        //Debug.Log($"points in pool count after merge - {pool.Points.Count}");
     }
 
     bool TryCalculateHeightAndGradient(float[,] nodes, int mapSize, float posX, float posY, out HeightAndGradient heightAndGradient)

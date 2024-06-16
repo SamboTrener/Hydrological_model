@@ -88,7 +88,7 @@ public class ErosionGenerator : MonoBehaviour
                 float cellOffsetY = posY - nodeY;
 
                 // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
-                HeightAndGradient heightAndGradient = CalculateHeightAndGradient(map, mapSize, posX, posY);
+                HeightAndGradient heightAndGradient = CalculateHeightAndGradient(map, posX, posY);
 
                 // Меняем направление и положение капли (меняем положение на 1 независимо от скорости).
                 dirX = (dirX * inertia - heightAndGradient.gradientX * (1 - inertia));
@@ -119,10 +119,10 @@ public class ErosionGenerator : MonoBehaviour
                 }
 
                 // Find the droplet's new height and calculate the deltaHeight
-                float newHeight = CalculateHeightAndGradient(map, mapSize, posX, posY).height;
+                float newHeight = CalculateHeightAndGradient(map, posX, posY).height;
                 float deltaHeight = newHeight - heightAndGradient.height;
 
-                // Calculate the droplet's sediment capacity (higher when moving fast down a slope and contains lots of water)
+
                 float sedimentCapacity = Mathf.Max(-deltaHeight * speed * water * sedimentCapacityFactor, minSedimentCapacity);
 
                 // If carrying more sediment than capacity, or if flowing uphill:
@@ -156,7 +156,6 @@ public class ErosionGenerator : MonoBehaviour
                         map[extraY, extraX] -= deltaSediment;
 
                         sediment += deltaSediment;
-                        water -= deltaSediment; //Вроде поломка краёв теперь через раз 
                     }
 
                     // Update droplet's speed and water content
@@ -167,27 +166,26 @@ public class ErosionGenerator : MonoBehaviour
         }
     }
 
-    HeightAndGradient CalculateHeightAndGradient(float[,] nodes, int mapSize, float posX, float posY)
+    HeightAndGradient CalculateHeightAndGradient(float[,] nodes, float posX, float posY)
     {
         int coordX = (int)posX;
         int coordY = (int)posY;
 
-        // Calculate droplet's offset inside the cell (0,0) = at NW node, (1,1) = at SE node
+        // Высчитываем смещение капли, точка (0,0) -  ячейка NW, (1,1) - ячейка SE
         float x = posX - coordX;
         float y = posY - coordY;
 
-        // Calculate heights of the four nodes of the droplet's cell
-        //int nodeIndexNW = coordY * mapSize + coordX;
+        //Высчитываем высоты в четырёх точках, которые окружают каплю
         float heightNW = nodes[coordY, coordX];
         float heightNE = nodes[coordY, coordX + 1];
         float heightSW = nodes[coordY + 1, coordX];
         float heightSE = nodes[coordY + 1, coordX + 1];
 
-        // Calculate droplet's direction of flow with bilinear interpolation of height difference along the edges
+        //Высчитываем направление движения капли с помощью билинейной интерполяции разницы высот окружающих точек
         float gradientX = (heightNE - heightNW) * (1 - y) + (heightSE - heightSW) * y;
         float gradientY = (heightSW - heightNW) * (1 - x) + (heightSE - heightNE) * x;
 
-        // Calculate height with bilinear interpolation of the heights of the nodes of the cell
+        //Высчитываем высоту с помощью билинейной интерполяции высот окружающих точек на карте 
         float height = heightNW * (1 - x) * (1 - y) + heightNE * x * (1 - y) + heightSW * (1 - x) * y + heightSE * x * y;
 
         return new HeightAndGradient() { height = height, gradientX = gradientX, gradientY = gradientY };
@@ -288,7 +286,7 @@ public class ErosionGenerator : MonoBehaviour
 
 
             // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
-            HeightAndGradient heightAndGradient = CalculateHeightAndGradient(map, mapSize, posX, posY);
+            HeightAndGradient heightAndGradient = CalculateHeightAndGradient(map, posX, posY);
 
             // Меняем направление и положение капли (меняем положение на 1 независимо от скорости).
             dirX = (dirX * inertia - heightAndGradient.gradientX * (1 - inertia));
@@ -314,7 +312,7 @@ public class ErosionGenerator : MonoBehaviour
             }
 
             // Find the droplet's new height and calculate the deltaHeight
-            float newHeight = CalculateHeightAndGradient(map, mapSize, posX, posY).height;
+            float newHeight = CalculateHeightAndGradient(map, posX, posY).height;
             float deltaHeight = newHeight - heightAndGradient.height;
 
             // Calculate the droplet's sediment capacity (higher when moving fast down a slope and contains lots of water)

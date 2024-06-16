@@ -12,6 +12,8 @@ public class ButtonsManager : MonoBehaviour
     [SerializeField] Button erodeOnceButton;
     [SerializeField] Button createPoolsButton;
     [SerializeField] Button buildADamButton;
+    [SerializeField] Button createPoolsFromPointButton;
+    [SerializeField] Button startGameButton;
 
     [SerializeField] int mapSize = 507;
     [SerializeField] int erosionBrushRadius = 3;
@@ -25,7 +27,7 @@ public class ButtonsManager : MonoBehaviour
     [SerializeField] MeshConstructor poolsConstructor;
 
     float[,] map;
-    float[,] floodMap;
+    float[,] poolMap;
     int mapSizeWithBorder;
 
     private void Awake()
@@ -42,48 +44,48 @@ public class ButtonsManager : MonoBehaviour
         createPoolsButton.onClick.AddListener(() => StartCoroutine(CreatePools()));
 
         buildADamButton.onClick.AddListener(BuildDam);
+
+        createPoolsFromPointButton.onClick.AddListener(() => StartCoroutine(CreatePoolsFromPoint()));
+
+        startGameButton.onClick.AddListener(() => StartCoroutine(StartGame()));
     }
 
+    IEnumerator StartGame()
+    {
+        CreateTerrain();
+        yield return Erode();
+        GameManager.Instance.SpawnTargets(map, 35, 15, elevationScale, xStart, yStart);
+        BuildDam();
+        yield return CreatePoolsFromPoint();
+        GameManager.Instance.GetResults(poolMap);
+    }
 
-    [SerializeField] int damXStart = 70;
-    [SerializeField] int damXFinish = 75;
-    [SerializeField] int damYStart = 20;
-    [SerializeField] int damYFinish = 30;
+    [SerializeField] int xStart;
+    [SerializeField] int yStart;
+    IEnumerator CreatePoolsFromPoint()
+    {
+        for (int i = 0; i < numStatesBeforeTheEnd; i++)
+        {
+            PoolGeneratorNonDynamic.Instance.GeneratePoolsFromPoint(map, poolMap, mapSizeWithBorder, numIterationsPools / numStatesBeforeTheEnd, xStart, yStart);
+            poolsConstructor.ConstructMesh(mapSize, poolMap, erosionBrushRadius, elevationScale);
+            Debug.Log("New mesh constructed");
+            yield return new WaitForSeconds(frameSpeed);
+        }
+    }
+
     void BuildDam()
     {
-        var prevMap = map.Clone();
-        var sum = 0f;
-        var count = 0;
-        for (int y = damYStart; y < damYFinish; y++)
-        {
-            for (int x = damXStart; x < damXFinish; x++)
-            {
-                sum += map[y, x];
-                count++;
-            }
-        }
-
-        for (int y = damYStart; y < damYFinish; y++)
-        {
-            for(int x = damXStart; x < damXFinish; x++)
-            {
-                map[y, x] = sum / count * 1.3f;
-            }
-        }
-        terrainConstructor.ConstructMesh(mapSize, mapSizeWithBorder, map, erosionBrushRadius, elevationScale);
-
-        PoolGeneratorNonDynamic.Instance.RebuildPools(prevMap as float[,], map, floodMap, mapSizeWithBorder, damYStart, damYFinish, damXStart, damXFinish);
-        poolsConstructor.ConstructMesh(mapSize, mapSizeWithBorder, floodMap, erosionBrushRadius, elevationScale);
+        DamManager.Instance.BuildDam(map, poolMap, mapSizeWithBorder);
+        terrainConstructor.ConstructMesh(mapSize, map, erosionBrushRadius, elevationScale);
+        poolsConstructor.ConstructMesh(mapSize, poolMap, erosionBrushRadius, elevationScale);
     }
 
     IEnumerator CreatePools()
     {
-        floodMap = new float[mapSizeWithBorder, mapSizeWithBorder];
-
         for(int i = 0; i < numStatesBeforeTheEnd; i++)
         {
-            PoolGeneratorNonDynamic.Instance.GeneratePools(map, floodMap, mapSizeWithBorder, numIterationsPools / numStatesBeforeTheEnd);
-            poolsConstructor.ConstructMesh(mapSize, mapSizeWithBorder, floodMap, erosionBrushRadius, elevationScale);
+            PoolGeneratorNonDynamic.Instance.GeneratePools(map, poolMap, mapSizeWithBorder, numIterationsPools / numStatesBeforeTheEnd);
+            poolsConstructor.ConstructMesh(mapSize, poolMap, erosionBrushRadius, elevationScale);
             Debug.Log("New mesh constructed");
             yield return new WaitForSeconds(frameSpeed);
         }
@@ -93,14 +95,17 @@ public class ButtonsManager : MonoBehaviour
     {
         mapSizeWithBorder = mapSize + erosionBrushRadius * 2;
         map = HeightmapGenerator.Instance.GenerateHeightMap(mapSizeWithBorder);
-        terrainConstructor.ConstructMesh(mapSize, mapSizeWithBorder, map, erosionBrushRadius, elevationScale);
+        terrainConstructor.ConstructMesh(mapSize, map, erosionBrushRadius, elevationScale);
+
+        poolMap = new float[mapSizeWithBorder, mapSizeWithBorder];
         //TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
     }
 
     IEnumerator ShowOneDropPath()
     {
         yield return ErosionGenerator.Instance.ErodeOnce(map, mapSizeWithBorder, elevationScale, numIterationsErosion / numStatesBeforeTheEnd);
-        TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
+        terrainConstructor.ConstructMesh(mapSize, map, erosionBrushRadius, elevationScale);
+        //TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
     }
 
     IEnumerator Erode()
@@ -108,7 +113,7 @@ public class ButtonsManager : MonoBehaviour
         for(int i = 0; i < numStatesBeforeTheEnd; i++)
         {
             ErosionGenerator.Instance.Erode(map, mapSizeWithBorder, numIterationsErosion / numStatesBeforeTheEnd);
-            terrainConstructor.ConstructMesh(mapSize, mapSizeWithBorder, map, erosionBrushRadius, elevationScale);
+            terrainConstructor.ConstructMesh(mapSize, map, erosionBrushRadius, elevationScale);
             //TerrainGenerator.Instance.CreateTerrain(elevationScale, mapSizeWithBorder, map);
             Debug.Log("New mesh constructed");
             yield return new WaitForSeconds(frameSpeed);

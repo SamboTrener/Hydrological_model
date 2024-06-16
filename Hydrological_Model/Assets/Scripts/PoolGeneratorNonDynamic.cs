@@ -40,7 +40,120 @@ public class PoolGeneratorNonDynamic : MonoBehaviour
         prng = new System.Random(seed);
     }
 
-    public void GeneratePools(float[,] map, float[,] poolMap, int mapSize, int numIterations = 30000)
+    public void GeneratePoolsFromPoint(float[,] map, float[,] poolMap, int mapSize, int numIterations, int xStart, int yStart)
+    {
+        Initialize();
+
+        for (int iteration = 0; iteration < numIterations; iteration++)
+        {
+            // —оздание капли в рандомной точке карты
+            var droplet = new WaterDroplet(xStart, yStart, 0, 0, initialSpeed, initialWaterVolume);
+
+            for (int lifetime = 0; lifetime < maxDropletLifetime; lifetime++)
+            {
+
+                int nodeX = (int)droplet.posX;
+                int nodeY = (int)droplet.posY;
+
+
+                if (lifetime == maxDropletLifetime - 1)
+                {
+                    droplet.dirX = 0;
+                    droplet.dirY = 0;
+                }
+
+                if (poolMap[nodeY, nodeX] > map[nodeY, nodeX])
+                {
+                    AddDropletToPool(poolMap, map, droplet, mapSize);
+                    break;
+                }
+
+                // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
+                HeightAndGradient heightAndGradient;
+                var isCalculated = TryCalculateHeightAndGradient(map, mapSize, droplet.posX, droplet.posY, out heightAndGradient);
+                if (!isCalculated)
+                {
+                    break;
+                }
+
+                // ћен€ем направление и положение капли.
+                droplet.dirX = (droplet.dirX * inertia - heightAndGradient.gradientX * (1 - inertia));
+                droplet.dirY = (droplet.dirY * inertia - heightAndGradient.gradientY * (1 - inertia));
+                // Ќормализаци€
+                float len = Mathf.Sqrt(droplet.dirX * droplet.dirX + droplet.dirY * droplet.dirY);
+                if (len != 0)
+                {
+                    droplet.dirX /= len;
+                    droplet.dirY /= len;
+                }
+                droplet.posX += droplet.dirX;
+                droplet.posY += droplet.dirY;
+
+                nodeX = (int)droplet.posX;
+                nodeY = (int)droplet.posY;
+
+                // Stop simulating droplet if it's not moving or has flowed over edge of map
+                if (droplet.posX < 0 || droplet.posX >= mapSize - 1 || droplet.posY < 0 || droplet.posY >= mapSize - 1)
+                {
+                    break;
+                }
+                if (droplet.dirX == 0 && droplet.dirY == 0)
+                {
+                    break;
+                }
+                if (droplet.volume <= 0.1 * initialWaterVolume)
+                {
+                    break;
+                }
+
+                // Find the droplet's new height and calculate the deltaHeight
+                HeightAndGradient newHeightAndGradient;
+                isCalculated = TryCalculateHeightAndGradient(map, mapSize, droplet.posX, droplet.posY, out newHeightAndGradient);
+                if (!isCalculated)
+                {
+                    break;
+                }
+                float newHeight = newHeightAndGradient.height;
+                float deltaHeight = newHeight - heightAndGradient.height;
+
+                // if flowing uphill:
+                if (deltaHeight > 0)
+                {
+                    if (lifetime == maxDropletLifetime - 1)
+                    {
+                        if (poolMap[nodeY, nodeX] > map[nodeY, nodeX])
+                        {
+                            AddDropletToPool(poolMap, map, droplet, mapSize);
+                        }
+                        else
+                        {
+                            CreatePool(poolMap, map, droplet, mapSize);
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    // Update droplet's speed and water content
+                    droplet.speed = Mathf.Sqrt(droplet.speed * droplet.speed + deltaHeight * gravity);
+                    droplet.volume *= (1 - evaporateSpeed);
+                    if (lifetime == maxDropletLifetime - 1)
+                    {
+                        lifetime--;
+                    }
+                }
+            }
+        }
+        foreach (var pool in pools)
+        {
+            if (pool.Points.Count > 0)
+            {
+                CorrectPool(poolMap, map, mapSize, pool);
+            }
+        }
+    }
+
+    public void GeneratePools(float[,] map, float[,] poolMap, int mapSize, int numIterations)
     {
         Initialize();
 
@@ -76,10 +189,10 @@ public class PoolGeneratorNonDynamic : MonoBehaviour
                     break;
                 }
 
-                // ћен€ем направление и положение капли (мен€ем положение на 1 независимо от скорости).
+                // ћен€ем направление и положение капли.
                 droplet.dirX = (droplet.dirX * inertia - heightAndGradient.gradientX * (1 - inertia));
                 droplet.dirY = (droplet.dirY * inertia - heightAndGradient.gradientY * (1 - inertia));
-                // Normalize direction
+                // Ќормализаци€
                 float len = Mathf.Sqrt(droplet.dirX * droplet.dirX + droplet.dirY * droplet.dirY);
                 if (len != 0)
                 {

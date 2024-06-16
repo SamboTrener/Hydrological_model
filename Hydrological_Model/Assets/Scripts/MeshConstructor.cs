@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,10 +10,9 @@ public class MeshConstructor : MonoBehaviour
     [SerializeField] MeshRenderer meshRenderer;
     [SerializeField] Material tempMaterial;
 
-
     Mesh mesh;
 
-    public void ConstructMesh(int mapSize, int mapSizeWithBorder, float[,] map, int erosionBrushRadius, float elevationScale)
+    public void ConstructMesh(int mapSize, float[,] map, int erosionBrushRadius, float elevationScale)
     {
         if (mesh == null)
         {
@@ -22,35 +22,32 @@ public class MeshConstructor : MonoBehaviour
 
         Vector3[] verts = new Vector3[mapSize * mapSize];
         int[] triangles = new int[(mapSize - 1) * (mapSize - 1) * 6];
-        int t = 0;
+        int t;
 
-        for (int i = 0; i < mapSize * mapSize; i++)
+        for (int y = 0; y < mapSize; y++)
         {
-            int x = i % mapSize;
-            int y = i / mapSize;
-            int borderedMapIndex = (y + erosionBrushRadius) * mapSizeWithBorder + x + erosionBrushRadius;
-            int meshMapIndex = y * mapSize + x;
-
-            Vector2 percent = new Vector2(x, y);
-            Vector3 pos = new Vector3(percent.x - 1, 0, percent.y - 1);
-
-            float normalizedHeight = map[y + erosionBrushRadius, x + erosionBrushRadius];
-            pos += Vector3.up * normalizedHeight * elevationScale;
-            verts[meshMapIndex] = pos;
-
-            // Construct triangles
-            if (x != mapSize - 1 && y != mapSize - 1)
+            for (int x = 0; x < mapSize; x++)
             {
-                t = (y * (mapSize - 1) + x) * 3 * 2;
+                int meshMapIndex = x * mapSize + y;
+                var vec = new Vector2(y, x);
+                var pos = new Vector3(vec.x - 1, 0, vec.y - 1);
 
-                triangles[t + 0] = meshMapIndex + mapSize;
-                triangles[t + 1] = meshMapIndex + mapSize + 1;
-                triangles[t + 2] = meshMapIndex;
+                float normalizedHeight = map[x + erosionBrushRadius, y + erosionBrushRadius];
+                pos += elevationScale * normalizedHeight * Vector3.up;
+                verts[meshMapIndex] = pos;
 
-                triangles[t + 3] = meshMapIndex + mapSize + 1;
-                triangles[t + 4] = meshMapIndex + 1;
-                triangles[t + 5] = meshMapIndex;
-                t += 6;
+                if (y != mapSize - 1 && x != mapSize - 1)
+                {
+                    t = (x * (mapSize - 1) + y) * 3 * 2;
+                    triangles[t + 0] = meshMapIndex + mapSize;
+                    triangles[t + 1] = meshMapIndex + mapSize + 1;
+                    triangles[t + 2] = meshMapIndex;
+
+                    triangles[t + 3] = meshMapIndex + mapSize + 1;
+                    triangles[t + 4] = meshMapIndex + 1;
+                    triangles[t + 5] = meshMapIndex;
+                    t += 6;
+                }
             }
         }
 
