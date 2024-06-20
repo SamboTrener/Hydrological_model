@@ -30,9 +30,9 @@ public class MeshConstructor : MonoBehaviour
             {
                 int meshMapIndex = x * mapSize + y;
                 var vec = new Vector2(y, x);
-                var pos = new Vector3(vec.x - 1, 0, vec.y - 1);
+                var pos = new Vector3(vec.x, 0, vec.y); 
 
-                float normalizedHeight = map[x + erosionBrushRadius, y + erosionBrushRadius];
+                float normalizedHeight = map[x, y];
                 pos += elevationScale * normalizedHeight * Vector3.up;
                 verts[meshMapIndex] = pos;
 

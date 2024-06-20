@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WaterDroplet 
@@ -10,6 +11,7 @@ public class WaterDroplet
     public float dirY;
     public float speed;
     public float volume;
+    public float sediment;
 
     public WaterDroplet(float posX, float posY, float dirX, float dirY, float speed, float volume) 
     {
@@ -19,5 +21,15 @@ public class WaterDroplet
         this.dirY = dirY;
         this.speed = speed;
         this.volume = volume;
+    }
+    public WaterDroplet(float posX, float posY, float dirX, float dirY, float speed, float volume, float sediment)
+    {
+        this.posX = posX;
+        this.posY = posY;
+        this.dirX = dirX;
+        this.dirY = dirY;
+        this.speed = speed;
+        this.volume = volume;
+        this.sediment = sediment;
     }
 }
