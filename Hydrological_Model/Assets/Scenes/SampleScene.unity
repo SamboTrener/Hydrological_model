@@ -133,7 +133,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1052357886795500433, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
       propertyPath: m_Name
-      value: StartLevelButton
+      value: PrepareForGameButton
       objectReference: {fileID: 0}
     - target: {fileID: 3369951920706757220, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
       propertyPath: m_SizeDelta.x
@@ -2086,7 +2086,7 @@ GameObject:
   - component: {fileID: 778447947}
   - component: {fileID: 778447946}
   m_Layer: 0
-  m_Name: PoolGenerator
+  m_Name: PoolGeneratorLegacy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2470,6 +2470,7 @@ RectTransform:
   - {fileID: 564319099}
   - {fileID: 39837703}
   - {fileID: 707090889}
+  - {fileID: 1648079555}
   - {fileID: 664632142}
   - {fileID: 1783275063}
   m_Father: {fileID: 0}
@@ -2830,6 +2831,60 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 46, y: 65, z: 0}
+--- !u!1 &987332344
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 987332346}
+  - component: {fileID: 987332345}
+  m_Layer: 0
+  m_Name: DropletPathDrawer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &987332345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987332344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e7332dcf5dec8f4e9e5549c845e2648, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineRenderer: {fileID: 67844957}
+  erodeOnceFrameSpeed: 0
+  evaporateSpeed: 0.01
+  gravity: 4
+  maxDropletLifetime: 30
+  initialWaterVolume: 1
+  initialSpeed: 1
+  inertia: 0.05
+  randomizeSeed: 1
+  seed: 0
+--- !u!4 &987332346
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987332344}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 592.8299, y: 359.00607, z: 2.7426808}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1076037688
 GameObject:
   m_ObjectHideFlags: 0
@@ -3825,10 +3880,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b22e98aa54a868445ab649ddd51f8f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xStart: {fileID: 0}
-  yStart: {fileID: 0}
-  xFinish: {fileID: 0}
-  yFinish: {fileID: 0}
+  xStartInput: {fileID: 1225286283}
+  yStartInput: {fileID: 1759239242}
+  xFinishInput: {fileID: 1481022481}
+  yFinishInput: {fileID: 108045858}
 --- !u!4 &1483034145
 Transform:
   m_ObjectHideFlags: 0
@@ -3879,7 +3934,9 @@ MonoBehaviour:
   createPoolsButton: {fileID: 779230218}
   buildADamButton: {fileID: 39837704}
   createPoolsFromPointButton: {fileID: 564319098}
-  startGameButton: {fileID: 707090886}
+  prepareForGameButton: {fileID: 707090886}
+  startGameButton: {fileID: 1648079556}
+  damCreationWindow: {fileID: 1783275062}
   mapSize: 58
   erosionBrushRadius: 3
   numIterationsPools: 1000
@@ -4092,6 +4149,147 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636212939}
   m_CullTransparentMesh: 1
+--- !u!224 &1648079555 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+  m_PrefabInstance: {fileID: 1660700948}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1648079556 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6229362453358732975, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+  m_PrefabInstance: {fileID: 1660700948}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1001 &1660700948
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 932767855}
+    m_Modifications:
+    - target: {fileID: 1052357886795500433, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_Name
+      value: StartGameButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 3369951920706757220, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3369951920706757220, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3369951920706757220, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3369951920706757220, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7094403191354260602, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: terrain
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7295665382362037187, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_text
+      value: "\u041F\u0443\u0441\u0442\u0438\u0442\u044C \u0432\u043E\u0434\u0443"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7295665382362037187, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_fontSize
+      value: 23.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_Pivot.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_Pivot.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 160
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 72.377686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -186.22998
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8833777180998564020, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 50a423a608811e74eb2f3047418cb24a, type: 3}
 --- !u!1 &1707844766
 GameObject:
   m_ObjectHideFlags: 0
@@ -4368,8 +4566,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8809f04dc0713c84ebbc23cf441d2214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 67844957}
-  erodeOnceFrameSpeed: 0.1
   randomizeSeed: 0
   seed: -4704
   erosionRadius: 3
@@ -4689,7 +4885,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1783275063
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4703,14 +4899,14 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 191549432}
-  - {fileID: 1225286282}
-  - {fileID: 1481022480}
-  - {fileID: 1759239241}
-  - {fileID: 108045857}
   - {fileID: 1076037689}
   - {fileID: 953304247}
   - {fileID: 1292218537}
   - {fileID: 1636212940}
+  - {fileID: 1225286282}
+  - {fileID: 1481022480}
+  - {fileID: 1759239241}
+  - {fileID: 108045857}
   m_Father: {fileID: 932767855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4859,7 +5055,9 @@ MonoBehaviour:
   createPoolsButton: {fileID: 779230218}
   buildADamButton: {fileID: 39837704}
   createPoolsFromPointButton: {fileID: 0}
+  prepareForGameButton: {fileID: 0}
   startGameButton: {fileID: 0}
+  damCreationWindow: {fileID: 0}
   mapSize: 122
   erosionBrushRadius: 3
   numIterationsPools: 3000
@@ -5379,12 +5577,12 @@ GameObject:
   - component: {fileID: 2117431523}
   - component: {fileID: 2117431522}
   m_Layer: 0
-  m_Name: TerrainGenerator
+  m_Name: TerrainGeneratorLegacy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2117431522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5434,3 +5632,4 @@ SceneRoots:
   - {fileID: 1773002077}
   - {fileID: 1483034145}
   - {fileID: 577881969}
+  - {fileID: 987332346}

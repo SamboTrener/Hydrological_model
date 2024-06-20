@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static WaterDropletExtensions;
 
 public class DropletPathDrawer : MonoBehaviour
 {
@@ -50,8 +47,8 @@ public class DropletPathDrawer : MonoBehaviour
             int nodeX = (int)droplet.posX;
             int nodeY = (int)droplet.posY;
 
-            lineRenderer.positionCount++; //Плюс одна точка в лайн рендере
-            lineRenderer.SetPosition(lifetime, new Vector3(nodeX, map[nodeY, nodeX] * scale, nodeY)); //Ставим эту точку туда где щас находимся
+            lineRenderer.positionCount++; 
+            lineRenderer.SetPosition(lifetime, new Vector3(nodeX, map[nodeY, nodeX] * scale, nodeY)); 
 
             var dropletShouldContinue = droplet.TryMoveDroplet(map, mapSize, inertia, gravity, evaporateSpeed);
             if (!dropletShouldContinue)

@@ -17,11 +17,10 @@ public class ErosionGenerator : MonoBehaviour
     [Range(2, 8)]
     [SerializeField] int erosionRadius = 3;
     [Range(0, 1)]
-    [SerializeField] float inertia = .05f; // ѕри нулевом значении вода мгновенно изменит направление и потечет вниз по склону.
-                                           // ѕри значении 1 вода никогда не изменит направление.
+    [SerializeField] float inertia = .05f; 
 
-    [SerializeField] float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
-    [SerializeField] float minSedimentCapacity = .01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
+    [SerializeField] float sedimentCapacityFactor = 4; 
+    [SerializeField] float minSedimentCapacity = .01f; 
     [Range(0, 1)]
     [SerializeField] float erodeSpeed = .3f;
     [Range(0, 1)]
@@ -34,12 +33,10 @@ public class ErosionGenerator : MonoBehaviour
     [SerializeField] float initialWaterVolume = 1;
     [SerializeField] float initialSpeed = 1;
 
-    // Indices and weights of erosion brush precomputed for every node
     System.Random prng;
 
     PointAndWeight[,][] precalculatedWeights;
 
-    // Initialization creates a System.Random object and precomputes indices and weights of erosion brush
     void Initialize(int mapSize, float[,] map)
     {
         seed = (randomizeSeed) ? Random.Range(-10000, 10000) : seed;
@@ -74,15 +71,11 @@ public class ErosionGenerator : MonoBehaviour
 
                 float sedimentCapacity = Mathf.Max(-LastDeltaHeight * droplet.speed * droplet.volume * sedimentCapacityFactor, minSedimentCapacity);
 
-                // If carrying more sediment than capacity, or if flowing uphill:
                 if (droplet.sediment > sedimentCapacity || LastDeltaHeight > 0)
                 {
-                    // If moving uphill (deltaHeight > 0) try fill up to the current height, otherwise deposit a fraction of the excess sediment
                     float amountToDeposit = (LastDeltaHeight > 0) ? Mathf.Min(LastDeltaHeight, droplet.sediment) : (droplet.sediment - sedimentCapacity) * depositSpeed;
                     droplet.sediment -= amountToDeposit;
 
-                    // Add the sediment to the four nodes of the current cell using bilinear interpolation
-                    // Deposition is not distributed over a radius (like erosion) so that it can fill small pits
                     map[nodeY, nodeX] += amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetY);
                     map[nodeY, nodeX + 1] += amountToDeposit * cellOffsetX * (1 - cellOffsetY);
                     map[nodeY + 1, nodeX] += amountToDeposit * (1 - cellOffsetX) * cellOffsetY;
@@ -90,11 +83,8 @@ public class ErosionGenerator : MonoBehaviour
                 }
                 else
                 {
-                    // Erode a fraction of the droplet's current carry capacity.
-                    // Clamp the erosion to the change in height so that it doesn't dig a hole in the terrain behind the droplet
                     float amountToErode = Mathf.Min((sedimentCapacity - droplet.sediment) * erodeSpeed, -LastDeltaHeight);
 
-                    // Use erosion brush to erode from all nodes inside the droplet's erosion radius
                     foreach (var element in precalculatedWeights[nodeY, nodeX])
                     {
                         var extraX = element.x;
